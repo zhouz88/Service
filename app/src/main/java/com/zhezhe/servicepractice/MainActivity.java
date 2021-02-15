@@ -1,91 +1,54 @@
 package com.zhezhe.servicepractice;
 
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
-import android.view.Menu;
-import android.widget.Toast;
+import android.widget.Button;
 
-import com.zhezhe.servicepractice.services.MyService;
+import com.zhezhe.servicepractice.services.MusicService;
 
-public class MainActivity extends AppCompatActivity {
-    int count = 0;
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+
+    private Button btn_main_play;
+    private Button btn_main_stop;
+    private Button btn_main_pause;
+    private Button btn_main_exit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (count % 2 == 0) {
-                    startMyService(view);
-                    bindMyService(view);
-                } else {
-                    unbindMyService(view);
-                    stopMyService(view);
-                }
-                count++;
-            }
-        });
+        this.btn_main_play = (Button) findViewById(R.id.btn_main_play);
+        this.btn_main_stop = (Button) findViewById(R.id.btn_main_stop);
+        this.btn_main_pause = (Button) findViewById(R.id.btn_main_pause);
+        this.btn_main_exit = (Button) findViewById(R.id.btn_main_exit);
+
+
+        btn_main_play.setOnClickListener(this);
+        btn_main_stop.setOnClickListener(this);
+        btn_main_pause.setOnClickListener(this);
+        btn_main_exit.setOnClickListener(this);
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    public void startMyService(View v) {
-        Intent intent = new Intent(MainActivity.this, MyService.class);
-        this.startService(intent);
-        Toast.makeText(this, "start service", Toast.LENGTH_SHORT).show();
-    }
-
-    public void stopMyService(View v) {
-        Intent intent = new Intent(MainActivity.this, MyService.class);
-        this.stopService(intent);
-        Toast.makeText(this, "stop service", Toast.LENGTH_SHORT).show();
-    }
-
-    ServiceConnection sc;
-
-    public void bindMyService(View v) {
-        Intent intent = new Intent(this, MyService.class);
-        if (sc == null) {
-            sc = new ServiceConnection() {
-                @Override
-                public void onServiceConnected(ComponentName name, IBinder service) {
-                    Log.e("TAG", "onServiceConnected");
-                }
-
-                @Override
-                public void onServiceDisconnected(ComponentName name) {
-                }
-            };
-        }
-        bindService(intent, sc, BIND_AUTO_CREATE);
-    }
-
-    public void unbindMyService(View v) {
-        if (sc == null) {
-            unbindService(sc);
-            sc = null;
-            Toast.makeText(this, "unbind service", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, "还么有bind serverice", Toast.LENGTH_SHORT).show();
+    public void onClick(View v) {
+        Intent intent = new Intent(this, MusicService.class);
+        if (v == btn_main_play) {
+            intent.putExtra("action", "play");
+            startService(intent);
+        } else if (v == btn_main_stop) {
+            intent.putExtra("action", "stop");
+            startService(intent);
+        } else if (v == btn_main_pause) {
+            intent.putExtra("action", "pause");
+            startService(intent);
+        } else if (v == btn_main_exit) {
+            //停止服务
+            stopService(intent);
+            finish();
         }
     }
 }
